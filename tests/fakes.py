@@ -10,7 +10,8 @@ class FakeValues:
         return range.split("!")[0]
 
     def get(self, spreadsheetId, range):
-        self._result = {"values": self.stores.get(spreadsheetId, {}).get(self._tab(range), [])}
+        # unknown spreadsheet raises like the real API; unknown tab is lenient
+        self._result = {"values": self.stores[spreadsheetId].get(self._tab(range), [])}
         return self
 
     def append(self, spreadsheetId, range, valueInputOption, body):

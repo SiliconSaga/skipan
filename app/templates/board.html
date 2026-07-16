@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skipan — crew board {{ date }}</title>
+<link rel="stylesheet" href="/static/skipan.css">
+</head>
+<body><main>
+  <h1>Skipan — {{ date }}</h1>
+  {% if flags_error %}<p class="warn">Amendment feed unavailable — flags omitted.</p>{% endif %}
+  {% for site in sites %}
+  <section class="site">
+    <h2>{{ site.site_id }} — {{ site.customer_name }} <small>{{ site.address }}</small></h2>
+    {% if conditions.get(site.site_id) %}<span class="badge {{ conditions[site.site_id] }}">{{ conditions[site.site_id] }}</span>{% endif %}
+    {% for flag in flags.get(site.site_id, []) %}
+    <p class="flag">scope +{{ "%.2f"|format(flag.total) }} — {{ flag.proposal_name }}</p>
+    {% endfor %}
+    <ul>
+      {% for person in people_by_site.get(site.site_id, []) %}
+      <li>{{ person.name }} <small>{{ person.crafts|join(", ") }}</small></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+  {% if unassigned %}<section class="site"><h2>Unassigned</h2><ul>{% for person in unassigned %}<li>{{ person.name }}</li>{% endfor %}</ul></section>{% endif %}
+</main></body>
+</html>
