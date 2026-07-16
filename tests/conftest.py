@@ -1,5 +1,3 @@
-from datetime import date  # noqa: F401 — used by the plan-route tests that join this suite family
-
 import pytest
 from fastapi.testclient import TestClient
 

@@ -22,3 +22,9 @@ def test_board_survives_broken_skipta_sheet(client, fakes):
     page = client.get("/?date=2026-07-17")
     assert page.status_code == 200
     assert "amendment feed unavailable" in page.text.lower()
+
+
+def test_board_ships_suggest_controls(client):
+    page = client.get("/?date=2026-07-17").text
+    assert 'id="suggest"' in page and 'id="apply"' in page
+    assert "/api/v1/suggest" in page and "/api/v1/apply" in page
