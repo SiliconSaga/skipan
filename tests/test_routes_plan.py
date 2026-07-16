@@ -1,4 +1,4 @@
-from app.planner import PlanError
+from app.planner import Plan, PlanError
 
 
 def test_suggest_returns_verified_plan_without_writing(client, fakes):
@@ -13,9 +13,10 @@ def test_suggest_returns_verified_plan_without_writing(client, fakes):
 
 
 def test_suggest_flags_hallucinated_person(client, fakes):
-    fakes["plan"] = fakes["plan"].model_copy(update={"moves": [
-        {"person_id": "ghost", "from_site": "", "to_site": "wh", "reason": "x"}
-    ]})
+    # Build through real validation — a ghost person_id is schema-valid; catching it is the verifier's job.
+    fakes["plan"] = Plan.model_validate(
+        {"moves": [{"person_id": "ghost", "from_site": "", "to_site": "wh", "reason": "x"}], "summary": "s"}
+    )
     data = client.post("/api/v1/suggest", json={"date": "2026-07-17"}).json()
     assert data["moves"][0]["valid"] is False
 

@@ -175,10 +175,7 @@ def suggest(
         plan = plan_fn(context, settings)
     except planner.PlanError as exc:
         raise HTTPException(status_code=502, detail=f"Could not draft a plan: {exc}") from exc
-    # plan.moves items are normally PlanMove instances, but a test double built via model_copy(update=...)
-    # (skipping validation) can leave raw dicts — accept either.
-    move_dicts = [m.model_dump() if hasattr(m, "model_dump") else dict(m) for m in plan.moves]
-    verified = verifier.verify_moves(move_dicts, data["crews"], data["sites"], data["assignments"])
+    verified = verifier.verify_moves([m.model_dump() for m in plan.moves], data["crews"], data["sites"], data["assignments"])
     warnings = verifier.coverage_warnings(data["crews"], data["sites"], data["assignments"], verified)
     return {"summary": plan.summary, "moves": [v.as_dict() for v in verified], "warnings": warnings}
 
