@@ -13,7 +13,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from app import amendments_feed, board, planner, verifier, weather  # noqa: F401 — verifier arrives with the suggest/apply routes
+from app import amendments_feed, board, planner, verifier, weather
 from app.config import Settings
 from app.google_clients import build_sheets, get_credentials, make_model_factory
 
@@ -140,3 +140,65 @@ def set_condition(
     day = _valid_date(body.date)
     board.set_condition(sheets, settings.board_sheet_id, day, body.condition)
     return {"date": day, "condition": body.condition}
+
+
+class SuggestRequest(BaseModel):
+    date: str
+
+
+class ApplyMove(BaseModel):
+    person_id: str
+    from_site: str = ""
+    to_site: str
+    reason: str = ""
+
+
+class ApplyRequest(BaseModel):
+    date: str
+    moves: list[ApplyMove]
+
+
+@app.post("/api/v1/suggest")
+@limiter.limit(lambda: f"{get_settings().rate_limit_per_minute}/minute")
+def suggest(
+    request: Request,
+    body: SuggestRequest,
+    settings: Settings = Depends(get_settings),
+    sheets=Depends(get_sheets),
+    http_get_json=Depends(get_http_get_json),
+    plan_fn=Depends(get_plan),
+):
+    day = _valid_date(body.date)
+    data = _load_day(settings, sheets, http_get_json, day)
+    context = planner.build_context(day, data["crews"], data["sites"], data["assignments"], data["flags"], data["conditions"])
+    try:
+        plan = plan_fn(context, settings)
+    except planner.PlanError as exc:
+        raise HTTPException(status_code=502, detail=f"Could not draft a plan: {exc}") from exc
+    # plan.moves items are normally PlanMove instances, but a test double built via model_copy(update=...)
+    # (skipping validation) can leave raw dicts — accept either.
+    move_dicts = [m.model_dump() if hasattr(m, "model_dump") else dict(m) for m in plan.moves]
+    verified = verifier.verify_moves(move_dicts, data["crews"], data["sites"], data["assignments"])
+    warnings = verifier.coverage_warnings(data["crews"], data["sites"], data["assignments"], verified)
+    return {"summary": plan.summary, "moves": [v.as_dict() for v in verified], "warnings": warnings}
+
+
+@app.post("/api/v1/apply")
+@limiter.limit(lambda: f"{get_settings().rate_limit_per_minute}/minute")
+def apply(
+    request: Request,
+    body: ApplyRequest,
+    settings: Settings = Depends(get_settings),
+    sheets=Depends(get_sheets),
+):
+    day = _valid_date(body.date)
+    crews = board.read_crews(sheets, settings.board_sheet_id)
+    sites = board.read_sites(sheets, settings.board_sheet_id)
+    assignments = board.read_assignments(sheets, settings.board_sheet_id, day)
+    verified = verifier.verify_moves([m.model_dump() for m in body.moves], crews, sites, assignments)
+    invalid = [v.as_dict() for v in verified if not v.valid]
+    if invalid:
+        raise HTTPException(status_code=422, detail={"message": "invalid moves — nothing applied", "moves": invalid})
+    applied = board.apply_moves(sheets, settings.board_sheet_id, day, [{"person_id": v.person_id, "to_site": v.to_site} for v in verified])
+    logger.info("applied %d moves on %s", applied, day)
+    return {"applied": applied}
