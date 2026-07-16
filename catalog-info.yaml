@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: skipan
+  description: AI-suggested crew scheduling board — proposes, a human disposes.
+  annotations:
+    siliconsaga.org/aspects: 'operational-readiness'
+spec:
+  type: service
+  lifecycle: experimental
+  owner: group:default/siliconsaga
