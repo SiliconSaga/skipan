@@ -96,3 +96,4 @@ TDD with the established fake-injection pattern: `FakeSheets` (Skipta's shape, t
 - Track B inventory (warehouse work content beyond "redirect people to the warehouse site").
 - Track C Leidangr GKE deploy (parallel, human-gated, own session) and Track D demo assembly (Saga narrative + Cycle container + walkthrough) — Skipan only pre-stages `catalog-info.yaml`.
 - Sports-league spreadsheet skin (data swap validation), muster-call issue integration, auth, plan history/audit trail, webhooks.
+- Site-to-site navigation in the planner context: the availability ramp is haversine straight-line from the existing Sites lat/lon (free, zero deps) → OSRM road distance/time (keyless demo server or self-hosted with OSM data) → live traffic and road closures (commercial APIs only — also the first feature that would force an API-key Secret into the posture). Pursue in that order, and only when a schedule decision actually hinges on travel.
