@@ -56,3 +56,36 @@ def read_condition_override(sheets, sid: str, date: str) -> str:
         if p[0] == date:
             return p[1]
     return ""
+
+
+def apply_moves(sheets, sid: str, date: str, moves: list[dict]) -> int:
+    current = {a["person_id"]: a for a in read_assignments(sheets, sid, date)}
+    applied = 0
+    for move in moves:
+        person, to_site = move["person_id"], move["to_site"]
+        existing = current.get(person)
+        if existing:
+            sheets.spreadsheets().values().update(
+                spreadsheetId=sid, range=f"{ASSIGN_TAB}!C{existing['row']}", valueInputOption="RAW",
+                body={"values": [[to_site]]},
+            ).execute()
+        else:
+            sheets.spreadsheets().values().append(
+                spreadsheetId=sid, range=ASSIGN_RANGE, valueInputOption="RAW",
+                body={"values": [[date, person, to_site, ""]]},
+            ).execute()
+        applied += 1
+    return applied
+
+
+def set_condition(sheets, sid: str, date: str, condition: str) -> None:
+    for index, row in enumerate(read_values(sheets, sid, DAYS_RANGE)):
+        if _pad(row, 3)[0] == date:
+            sheets.spreadsheets().values().update(
+                spreadsheetId=sid, range=f"{DAYS_TAB}!B{index + 2}", valueInputOption="RAW",
+                body={"values": [[condition]]},
+            ).execute()
+            return
+    sheets.spreadsheets().values().append(
+        spreadsheetId=sid, range=DAYS_RANGE, valueInputOption="RAW", body={"values": [[date, condition, ""]]}
+    ).execute()
