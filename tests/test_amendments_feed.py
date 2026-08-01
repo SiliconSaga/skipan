@@ -37,6 +37,7 @@ def test_lookback_window_excludes_old_rows():
 def test_unparseable_total_skips_row_not_feed():
     sheets = make_sheets([
         row("Smith", "$500", "signed", "2026-07-14T10:00:00+00:00", "amend", "typo.pdf"),
+        row("Smith", "inf", "signed", "2026-07-14T10:00:00+00:00", "amend", "inf.pdf"),
         row("rasmus", "500.00", "signed", "2026-07-14T10:00:00+00:00", "amend", "span-quote.pdf"),
     ])
     flags = read_amendment_flags(sheets, SKIPTA, SITES, date(2026, 7, 15), 14)

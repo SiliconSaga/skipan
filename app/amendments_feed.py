@@ -1,4 +1,5 @@
 """Skipta's Amendments sheet is the integration bus: read-only, matched to sites by customer name."""
+import math
 from datetime import date as date_type
 
 from app.google_clients import read_values
@@ -25,6 +26,8 @@ def read_amendment_flags(sheets, skipta_sid: str, sites: list[dict], today: date
         try:
             total = float(padded[6] or 0)
         except ValueError:
+            continue
+        if not math.isfinite(total):
             continue
         site_id = site_by_customer.get(padded[2].lower())
         if site_id:

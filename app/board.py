@@ -1,4 +1,6 @@
 """The board spreadsheet: Crews/Sites/Assignments/Days reads and Assignment/Days writes."""
+import math
+
 from app.google_clients import read_values
 
 CREWS_RANGE = "Crews!A2:D"
@@ -19,9 +21,10 @@ def _pad(row: list, width: int) -> list:
 
 def _coord(value: str):
     try:
-        return float(value) if value else None
+        coord = float(value)
     except ValueError:
         return None
+    return coord if math.isfinite(coord) else None
 
 
 def read_crews(sheets, sid: str) -> list[dict]:

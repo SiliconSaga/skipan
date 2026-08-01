@@ -43,6 +43,12 @@ def test_read_sites_parses_coords_and_lists():
     assert sites[3]["work_type"] == "warehouse"
 
 
+def test_non_finite_coords_degrade_to_none():
+    sheets = FakeSheets({BOARD: {"Sites": [["s4", "X", "addr", "nan", "inf", "outdoor", "", ""]]}})
+    sites = read_sites(sheets, BOARD)
+    assert sites[0]["lat"] is None and sites[0]["lon"] is None
+
+
 def test_read_assignments_filters_by_date_with_rows():
     got = read_assignments(make_sheets(), BOARD, "2026-07-16")
     assert [(a["row"], a["person_id"], a["site_id"]) for a in got] == [(2, "p1", "s1"), (3, "p2", "s2")]

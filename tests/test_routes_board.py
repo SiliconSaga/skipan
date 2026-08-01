@@ -22,7 +22,8 @@ def test_coordless_outdoor_site_shows_unknown_badge(client, fakes):
         ["s9", "Reyes", "9 Elm Rd", "", "", "outdoor", "", ""]
     )
     page = client.get("/?date=2026-07-17").text
-    assert "unknown" in page
+    section = page.split("s9 — Reyes")[1].split("</section>")[0]
+    assert "badge unknown" in section
 
 
 def test_board_survives_broken_skipta_sheet(client, fakes):
