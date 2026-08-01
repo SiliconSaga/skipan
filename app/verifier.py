@@ -1,4 +1,5 @@
 """Deterministic gate for LLM-proposed moves — the UNMATCHED sibling. Pure functions, no I/O."""
+from collections import Counter
 from dataclasses import asdict, dataclass, field
 
 
@@ -19,7 +20,7 @@ def verify_moves(moves: list[dict], crews: list[dict], sites: list[dict], assign
     people = {c["person_id"] for c in crews}
     site_ids = {s["site_id"] for s in sites}
     current = {a["person_id"]: a["site_id"] for a in assignments}
-    seen: set[str] = set()
+    counts = Counter(m.get("person_id", "") for m in moves)
     out = []
     for move in moves:
         person = move.get("person_id", "")
@@ -34,9 +35,8 @@ def verify_moves(moves: list[dict], crews: list[dict], sites: list[dict], assign
             actual = current.get(person, "")
             if from_site != actual:
                 issues.append(f"from_site {from_site or '(unassigned)'} does not match current {actual or '(unassigned)'}")
-        if person in seen:
+        if counts[person] > 1:
             issues.append("duplicate move for person in this plan")
-        seen.add(person)
         out.append(VerifiedMove(person, from_site, to_site, move.get("reason", ""), not issues, issues))
     return out
 

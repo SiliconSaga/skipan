@@ -17,6 +17,14 @@ def test_condition_override_wins_on_next_render(client):
     assert "rain-risk" not in page
 
 
+def test_coordless_outdoor_site_shows_unknown_badge(client, fakes):
+    fakes["sheets"].stores["board123"]["Sites"].append(
+        ["s9", "Reyes", "9 Elm Rd", "", "", "outdoor", "", ""]
+    )
+    page = client.get("/?date=2026-07-17").text
+    assert "unknown" in page
+
+
 def test_board_survives_broken_skipta_sheet(client, fakes):
     del fakes["sheets"].stores["skipta456"]
     page = client.get("/?date=2026-07-17")

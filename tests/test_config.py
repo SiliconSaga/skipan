@@ -2,6 +2,8 @@ from app.config import Settings
 
 
 def test_from_env_reads_and_defaults(monkeypatch):
+    for var in ("GCP_REGION", "SKIPAN_BASE_URL", "SKIPAN_RAIN_THRESHOLD", "SKIPAN_LOOKBACK_DAYS"):
+        monkeypatch.delenv(var, raising=False)
     monkeypatch.setenv("GCP_PROJECT_ID", "proj")
     monkeypatch.setenv("SKIPAN_BOARD_SHEET_ID", "board123")
     monkeypatch.setenv("SKIPAN_SKIPTA_SHEET_ID", "skipta456")

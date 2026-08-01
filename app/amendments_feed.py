@@ -22,7 +22,11 @@ def read_amendment_flags(sheets, skipta_sid: str, sites: list[dict], today: date
             continue
         if (today - signed_on).days > lookback_days:
             continue
+        try:
+            total = float(padded[6] or 0)
+        except ValueError:
+            continue
         site_id = site_by_customer.get(padded[2].lower())
         if site_id:
-            flags.setdefault(site_id, []).append({"proposal_name": padded[12], "total": float(padded[6] or 0)})
+            flags.setdefault(site_id, []).append({"proposal_name": padded[12], "total": total})
     return flags

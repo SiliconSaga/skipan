@@ -18,7 +18,10 @@ def _pad(row: list, width: int) -> list:
 
 
 def _coord(value: str):
-    return float(value) if value else None
+    try:
+        return float(value) if value else None
+    except ValueError:
+        return None
 
 
 def read_crews(sheets, sid: str) -> list[dict]:

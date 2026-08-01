@@ -39,6 +39,7 @@ def test_duplicate_person_in_move_set_invalid():
          {"person_id": "p1", "from_site": "s1", "to_site": "s1"}],
         CREWS, SITES, ASSIGNED,
     )
+    assert verified[0].valid is False and any("duplicate" in i for i in verified[0].issues)
     assert verified[1].valid is False and any("duplicate" in i for i in verified[1].issues)
 
 
