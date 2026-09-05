@@ -5,6 +5,13 @@ h1 { font-size: 1.3rem; }
 section.site { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: .8rem; margin: .8rem 0; }
 section.site h2 { font-size: 1.05rem; margin: 0 0 .3rem; }
 .badge { display: inline-block; padding: .1rem .5rem; border-radius: 999px; font-size: .8rem; background: #e7e5e4; }
+.sid { color: #a8a29e; font-weight: normal; font-size: .75rem; }
+.meta { border-collapse: collapse; font-size: .9rem; margin: 0 0 .4rem; }
+.meta th { text-align: left; font-weight: 500; color: #78716c; padding: .1rem .7rem .1rem 0; vertical-align: top; white-space: nowrap; }
+.meta td { padding: .1rem 0; }
+.crew-label { margin: .3rem 0 .1rem; font-weight: 500; color: #78716c; font-size: .9rem; }
+.need { display: inline-block; margin-right: .5rem; white-space: nowrap; }
+.nobody { color: #a8a29e; }
 .badge.rain-risk, .badge.rain { background: #dbeafe; color: #1d4ed8; }
 .badge.unknown { background: #fef3c7; }
 .flag { background: #fef3c7; border: 1px solid #f59e0b; padding: .4rem .6rem; border-radius: 6px; font-size: .9rem; }

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: skipan-config
+  namespace: skipan
+data:
+  gcp_project_id: "teralivekubernetes"
+  gcp_region: "us-east1"
+  board_sheet_id: "1Pw5rKmE98tkRZNxgavMM7fTfZUII4rdr8u5xEJEW7Ws"
+  skipta_sheet_id: "11cKYWrc4TdfdfD5ko2BkAzttCy7-q2U79LmNeQ2Rn1w"
+  base_url: "https://skipan.cmdbee.org"
+  rain_threshold: "50"
+  lookback_days: "14"

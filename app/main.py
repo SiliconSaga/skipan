@@ -1,6 +1,7 @@
 """Skipan — crew board. Routes only; logic lives in the sibling modules."""
 import logging
 import os
+import threading
 from datetime import date as date_type
 from pathlib import Path
 
@@ -29,7 +30,7 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 _settings: Settings | None = None
-_clients: dict = {}
+_local = threading.local()
 
 
 def get_settings() -> Settings:
@@ -40,9 +41,11 @@ def get_settings() -> Settings:
 
 
 def get_sheets():
-    if "sheets" not in _clients:
-        _clients["sheets"] = build_sheets(get_credentials())
-    return _clients["sheets"]
+    # One client per thread: httplib2 under googleapiclient is not thread-safe, and endpoints run
+    # in a threadpool — a shared client's stale TLS connection surfaces as ssl.SSLError 500s.
+    if not hasattr(_local, "sheets"):
+        _local.sheets = build_sheets(get_credentials())
+    return _local.sheets
 
 
 def get_http_get_json():
@@ -73,10 +76,12 @@ def _load_day(settings: Settings, sheets, http_get_json, date: str) -> dict:
     override = board.read_condition_override(sheets, settings.board_sheet_id, date)
     conditions = {}
     for site in sites:
-        if site["work_type"] == "outdoor":
-            has_coords = site["lat"] is not None and site["lon"] is not None
-            precip = weather.fetch_precip_probability(http_get_json, site["lat"], site["lon"], date) if has_coords else None
+        has_coords = site["lat"] is not None and site["lon"] is not None
+        if has_coords:
+            precip = weather.fetch_precip_probability(http_get_json, site["lat"], site["lon"], date)
             conditions[site["site_id"]] = weather.resolve_condition(override, precip, settings.rain_threshold)
+        elif "outdoor" in site["needs"]:
+            conditions[site["site_id"]] = weather.resolve_condition(override, None, settings.rain_threshold)
         elif override:
             conditions[site["site_id"]] = override
     flags: dict = {}

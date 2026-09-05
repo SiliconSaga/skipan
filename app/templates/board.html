@@ -8,16 +8,28 @@
 <body><main>
   <h1>Skipan — {{ date }}</h1>
   {% if flags_error %}<p class="warn">Amendment feed unavailable — flags omitted.</p>{% endif %}
+  {% set weather_icons = {"clear": "☀️", "rain": "🌧️", "rain-risk": "🌧️", "unknown": "❓"} %}
   {% for site in sites %}
+  {% set customer = site.customer_name if site.customer_name and site.customer_name not in ["-", "—"] else "" %}
   <section class="site">
-    <h2>{{ site.site_id }} — {{ site.customer_name }} <small>{{ site.address }}</small></h2>
-    {% if conditions.get(site.site_id) %}<span class="badge {{ conditions[site.site_id] }}">{{ conditions[site.site_id] }}</span>{% endif %}
+    <h2>{{ site.job_name or customer or site.site_id }} <small class="sid">{{ site.site_id }}</small></h2>
+    <table class="meta">
+      {% if customer %}<tr><th>Customer</th><td>{{ customer }}</td></tr>{% endif %}
+      {% if site.address %}<tr><th>Address</th><td>{{ site.address }}</td></tr>{% endif %}
+      {% if conditions.get(site.site_id) %}<tr><th>Weather</th><td><span class="badge {{ conditions[site.site_id] }}">{{ weather_icons.get(conditions[site.site_id], "") }} {{ conditions[site.site_id] }}</span></td></tr>{% endif %}
+      <tr><th>Site needs</th><td>{% for n in ["indoor", "outdoor"] %}<span class="need">{{ "☑" if n in site.needs else "☐" }} {{ n }}</span> {% endfor %}{% for n in site.needs if n not in ["indoor", "outdoor"] %}<span class="need">☑ {{ n }}</span> {% endfor %}</td></tr>
+      {% if site.needed_crafts %}<tr><th>Staff needed</th><td>{{ site.needed_crafts|join(", ") }}</td></tr>{% endif %}
+      {% if site.notes %}<tr><th>Notes</th><td>{{ site.notes }}</td></tr>{% endif %}
+    </table>
     {% for flag in flags.get(site.site_id, []) %}
-    <p class="flag">scope +{{ "%.2f"|format(flag.total) }} — {{ flag.proposal_name }}</p>
+    <p class="flag">Signed amendment: {{ flag.proposal_name }} adds {{ "%.2f"|format(flag.total) }} to scope</p>
     {% endfor %}
+    <p class="crew-label">Crew today:</p>
     <ul>
       {% for person in people_by_site.get(site.site_id, []) %}
       <li>{{ person.name }} <small>{{ person.crafts|join(", ") }}</small></li>
+      {% else %}
+      <li class="nobody">nobody assigned</li>
       {% endfor %}
     </ul>
   </section>

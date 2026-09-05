@@ -46,10 +46,12 @@ PLAN_SCHEMA = {
 
 PROMPT = (
     "You are a field-crew dispatcher's assistant. Given today's schedule context as JSON, propose crew moves that "
-    "address scope changes and site conditions. Move ONLY people listed in the context, ONLY between sites listed in "
-    "the context, prefer moves that keep each site's needed crafts covered, use an empty from_site exactly when the "
-    "person is currently unassigned, and give a one-sentence reason per move. Propose no move when none is needed.\n\n"
-    "Context:\n{context}"
+    "address scope changes and site conditions. Each site's needs list says what kind of work it holds: a site whose "
+    "needs include outdoor is weather-exposed, and in rain or rain-risk conditions prefer moving people off sites "
+    "whose only need is outdoor onto sites with indoor work. Move ONLY people listed in the context, ONLY between "
+    "sites listed in the context, prefer moves that keep each site's needed crafts covered, use an empty from_site "
+    "exactly when the person is currently unassigned, and give a one-sentence reason per move. Propose no move when "
+    "none is needed.\n\nContext:\n{context}"
 )
 
 
@@ -63,7 +65,7 @@ def build_context(date: str, crews, sites, assignments, flags, conditions) -> di
         ],
         "sites": [
             {
-                "site_id": s["site_id"], "work_type": s["work_type"], "needed_crafts": s["needed_crafts"],
+                "site_id": s["site_id"], "needs": s["needs"], "needed_crafts": s["needed_crafts"],
                 "condition": conditions.get(s["site_id"], "clear"),
                 "scope_changes": flags.get(s["site_id"], []),
             }

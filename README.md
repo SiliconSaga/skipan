@@ -16,4 +16,6 @@ Docs: [design](docs/plans/2026-07-15-skipan-crew-board-design.md) · [plan](docs
 
 ## Deploy
 
-GitHub Actions builds `ghcr.io/siliconsaga/skipan` on push to main; apply `k8s/base` with kustomize (workspace: `ws k8s apply -k components/skipan/k8s/base -n skipan`).
+GitHub Actions builds `ghcr.io/siliconsaga/skipan` on push to main. The namespace is created explicitly (`ws k8s create namespace skipan` — it is deliberately outside the kustomize base so the namespace-scoped guard can authorize the apply), then apply `k8s/base` with kustomize (workspace: `ws k8s apply -k components/skipan/k8s/base -n skipan`).
+
+**Verified live** at [skipan.cmdbee.org](https://skipan.cmdbee.org): board render with real forecast badges, condition override, amendment-flag read from the Skipta sheet, and the suggest → verify → apply loop, all keyless via Workload Identity.

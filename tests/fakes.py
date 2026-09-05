@@ -5,21 +5,25 @@ import re
 class FakeValues:
     def __init__(self, stores):
         self.stores = stores  # sid -> {tab: [rows]} (no header rows)
+        self.calls = []  # (verb, num_retries) per executed request — pins the retry policy per verb
 
     def _tab(self, range):
         return range.split("!")[0]
 
     def get(self, spreadsheetId, range):
         # unknown spreadsheet raises like the real API; unknown tab is lenient
+        self._verb = "get"
         self._result = {"values": self.stores[spreadsheetId].get(self._tab(range), [])}
         return self
 
     def append(self, spreadsheetId, range, valueInputOption, body):
+        self._verb = "append"
         self.stores.setdefault(spreadsheetId, {}).setdefault(self._tab(range), []).extend(body["values"])
         self._result = {}
         return self
 
     def update(self, spreadsheetId, range, valueInputOption, body):
+        self._verb = "update"
         tab = self._tab(range)
         cell = range.split("!")[1]
         m = re.match(r"([A-Z]+)(\d+)", cell)
@@ -33,7 +37,8 @@ class FakeValues:
         self._result = {}
         return self
 
-    def execute(self):
+    def execute(self, num_retries=0):
+        self.calls.append((self._verb, num_retries))
         return self._result
 
 
