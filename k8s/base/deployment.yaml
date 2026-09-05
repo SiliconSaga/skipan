@@ -11,11 +11,21 @@ spec:
     metadata:
       labels: {app: skipan}
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: skipan-sa
       containers:
       - name: skipan
         image: ghcr.io/siliconsaga/skipan:latest
         imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          runAsNonRoot: true
+          runAsUser: 10001
+          runAsGroup: 10001
         ports:
         - containerPort: 8000
         env:
