@@ -1,0 +1,17 @@
+* { box-sizing: border-box; }
+body { font-family: system-ui, sans-serif; margin: 0; padding: 1rem; background: #f5f5f4; color: #1c1917; }
+main { max-width: 680px; margin: 0 auto; }
+h1 { font-size: 1.3rem; }
+section.site { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: .8rem; margin: .8rem 0; }
+section.site h2 { font-size: 1.05rem; margin: 0 0 .3rem; }
+.badge { display: inline-block; padding: .1rem .5rem; border-radius: 999px; font-size: .8rem; background: #e7e5e4; }
+.badge.rain-risk, .badge.rain { background: #dbeafe; color: #1d4ed8; }
+.badge.unknown { background: #fef3c7; }
+.flag { background: #fef3c7; border: 1px solid #f59e0b; padding: .4rem .6rem; border-radius: 6px; font-size: .9rem; }
+.warn { background: #fef3c7; border: 1px solid #f59e0b; padding: .8rem; border-radius: 6px; }
+button { padding: .7rem 1rem; border: 0; border-radius: 6px; background: #1d4ed8; color: #fff; font-size: 1rem; }
+button:disabled { background: #a8a29e; }
+li small { color: #78716c; }
+.move { border: 1px solid #d6d3d1; border-radius: 6px; padding: .5rem; margin: .4rem 0; }
+.move.invalid { opacity: .55; text-decoration: line-through; }
+.issues { color: #b91c1c; font-size: .85rem; }
