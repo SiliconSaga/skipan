@@ -31,6 +31,15 @@ def test_apply_moves_appends_for_unassigned_person():
     assert got["p9"] == "s1"
 
 
+def test_reads_and_updates_retry_but_appends_never_do():
+    sheets = make_sheets()
+    apply_moves(sheets, BOARD, "2026-07-16", [{"person_id": "p2", "to_site": "wh"}, {"person_id": "p9", "to_site": "s1"}])
+    calls = sheets.values().calls
+    assert ("update", 2) in calls and ("append", 0) in calls
+    assert all(retries == 2 for verb, retries in calls if verb in ("get", "update"))
+    assert all(retries == 0 for verb, retries in calls if verb == "append")  # a retried append can duplicate rows
+
+
 def test_set_condition_updates_then_appends():
     sheets = make_sheets()
     set_condition(sheets, BOARD, "2026-07-16", "rain")

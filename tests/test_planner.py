@@ -39,7 +39,7 @@ def test_build_context_is_compact_and_complete():
     context = build_context(
         "2026-07-17",
         [{"person_id": "p1", "name": "Ada", "crafts": ["electrician"], "crew": "alpha"}],
-        [{"site_id": "s1", "customer_name": "Smith", "needed_crafts": ["electrician"], "work_type": "outdoor", "lat": 1.0, "lon": 2.0, "address": "", "notes": ""}],
+        [{"site_id": "s1", "customer_name": "Smith", "needed_crafts": ["electrician"], "needs": ["outdoor"], "lat": 1.0, "lon": 2.0, "address": "", "notes": ""}],
         [{"row": 2, "person_id": "p1", "site_id": "s1", "note": ""}],
         {"s1": [{"proposal_name": "span.pdf", "total": 500.0}]},
         {"s1": "rain-risk"},

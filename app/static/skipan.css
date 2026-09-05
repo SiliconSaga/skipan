@@ -10,6 +10,7 @@ section.site h2 { font-size: 1.05rem; margin: 0 0 .3rem; }
 .meta th { text-align: left; font-weight: 500; color: #78716c; padding: .1rem .7rem .1rem 0; vertical-align: top; white-space: nowrap; }
 .meta td { padding: .1rem 0; }
 .crew-label { margin: .3rem 0 .1rem; font-weight: 500; color: #78716c; font-size: .9rem; }
+.need { display: inline-block; margin-right: .5rem; white-space: nowrap; }
 .nobody { color: #a8a29e; }
 .badge.rain-risk, .badge.rain { background: #dbeafe; color: #1d4ed8; }
 .badge.unknown { background: #fef3c7; }

@@ -17,7 +17,7 @@
       {% if customer %}<tr><th>Customer</th><td>{{ customer }}</td></tr>{% endif %}
       {% if site.address %}<tr><th>Address</th><td>{{ site.address }}</td></tr>{% endif %}
       {% if conditions.get(site.site_id) %}<tr><th>Weather</th><td><span class="badge {{ conditions[site.site_id] }}">{{ weather_icons.get(conditions[site.site_id], "") }} {{ conditions[site.site_id] }}</span></td></tr>{% endif %}
-      <tr><th>Site needs</th><td>{{ site.work_type }}</td></tr>
+      <tr><th>Site needs</th><td>{% for n in ["indoor", "outdoor"] %}<span class="need">{{ "☑" if n in site.needs else "☐" }} {{ n }}</span> {% endfor %}{% for n in site.needs if n not in ["indoor", "outdoor"] %}<span class="need">☑ {{ n }}</span> {% endfor %}</td></tr>
       {% if site.needed_crafts %}<tr><th>Staff needed</th><td>{{ site.needed_crafts|join(", ") }}</td></tr>{% endif %}
       {% if site.notes %}<tr><th>Notes</th><td>{{ site.notes }}</td></tr>{% endif %}
     </table>

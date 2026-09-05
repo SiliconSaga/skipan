@@ -9,7 +9,8 @@ def test_board_renders_sites_people_weather_and_flags(client):
     assert "span-quote.pdf" in page and "500.00" in page  # amendment flag on Rasmus site
     assert "Depot" in page
     assert "Rasmus electrical panel overhaul" in page  # job_name headline
-    assert "<th>Site needs</th><td>outdoor</td>" in page and "<th>Site needs</th><td>warehouse</td>" in page
+    assert '<span class="need">☑ indoor</span> <span class="need">☑ outdoor</span>' in page  # both checked on s1
+    assert '<span class="need">☑ indoor</span> <span class="need">☐ outdoor</span>' in page  # indoor-only wh
     assert "<th>Staff needed</th><td>electrician</td>" in page
     assert "<th>Notes</th><td>SPAN panel job</td>" in page
     assert "<h2>wh " in page                        # no job name and "-" customer falls back to site_id
@@ -34,11 +35,11 @@ def test_coordless_outdoor_site_shows_unknown_badge(client, fakes):
 
 def test_any_site_with_coords_gets_forecast_badge(client, fakes):
     fakes["sheets"].stores["board123"]["Sites"].append(
-        ["yard", "Yard", "9 Dock St", "40.70", "-74.10", "warehouse", "", ""]
+        ["yard", "Yard", "9 Dock St", "40.70", "-74.10", "indoor", "", ""]
     )
     page = client.get("/?date=2026-07-17").text
     section = page.split('sid">yard</small>')[1].split("</section>")[0]
-    assert "badge rain-risk" in section  # 80% fake forecast applies beyond outdoor sites
+    assert "badge rain-risk" in section  # 80% fake forecast applies beyond outdoor-need sites
 
 
 def test_board_survives_broken_skipta_sheet(client, fakes):

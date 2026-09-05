@@ -13,10 +13,10 @@ def make_sheets():
                 ["p3", "Cy"],  # short row: no crafts, no crew
             ],
             "Sites": [
-                ["s1", "Smith", "1 Main St", "40.79", "-74.25", "outdoor", "electrician", "panel job"],
+                ["s1", "Smith", "1 Main St", "40.79", "-74.25", "indoor, outdoor", "electrician", "panel job"],
                 ["s2", "Jones", "2 Oak Ave", "", "", "indoor", "", ""],
                 ["s3", "Reyes", "3 Elm Rd", "40.79°N", "-74.25", "outdoor", "", ""],  # hand-typed coord
-                ["wh", "—", "Depot", "", "", "warehouse", "", ""],
+                ["wh", "—", "Depot", "", "", "", "", ""],  # blank needs default to outdoor
             ],
             "Assignments": [
                 ["2026-07-16", "p1", "s1", ""],
@@ -38,9 +38,10 @@ def test_read_sites_parses_coords_and_lists():
     sites = read_sites(make_sheets(), BOARD)
     assert sites[0]["lat"] == 40.79 and sites[0]["lon"] == -74.25
     assert sites[0]["needed_crafts"] == ["electrician"]
+    assert sites[0]["needs"] == ["indoor", "outdoor"]
     assert sites[1]["lat"] is None and sites[1]["needed_crafts"] == []
     assert sites[2]["lat"] is None and sites[2]["lon"] == -74.25  # unparseable coord degrades, not 500s
-    assert sites[3]["work_type"] == "warehouse"
+    assert sites[3]["needs"] == ["outdoor"]  # blank needs default
     assert sites[0]["job_name"] == ""  # 8-column row pads the optional job_name
 
 

@@ -41,7 +41,7 @@ def read_sites(sheets, sid: str) -> list[dict]:
         p = _pad(row, 9)
         out.append({
             "site_id": p[0], "customer_name": p[1], "address": p[2],
-            "lat": _coord(p[3]), "lon": _coord(p[4]), "work_type": p[5] or "outdoor",
+            "lat": _coord(p[3]), "lon": _coord(p[4]), "needs": _csv(p[5]) or ["outdoor"],
             "needed_crafts": _csv(p[6]), "notes": p[7], "job_name": p[8],
         })
     return out
@@ -76,10 +76,11 @@ def apply_moves(sheets, sid: str, date: str, moves: list[dict]) -> int:
                 body={"values": [[to_site]]},
             ).execute(num_retries=2)
         else:
+            # No retries on appends: a retry after a committed-but-failed response would duplicate the row.
             sheets.spreadsheets().values().append(
                 spreadsheetId=sid, range=ASSIGN_RANGE, valueInputOption="RAW",
                 body={"values": [[date, person, to_site, ""]]},
-            ).execute(num_retries=2)
+            ).execute()
         applied += 1
     return applied
 
@@ -94,4 +95,4 @@ def set_condition(sheets, sid: str, date: str, condition: str) -> None:
             return
     sheets.spreadsheets().values().append(
         spreadsheetId=sid, range=DAYS_RANGE, valueInputOption="RAW", body={"values": [[date, condition, ""]]}
-    ).execute(num_retries=2)
+    ).execute()

@@ -5,8 +5,8 @@ CREWS = [
     {"person_id": "p2", "name": "Bo", "crafts": ["hvac"], "crew": "alpha"},
 ]
 SITES = [
-    {"site_id": "s1", "customer_name": "Smith", "needed_crafts": ["electrician"], "work_type": "outdoor"},
-    {"site_id": "wh", "customer_name": "—", "needed_crafts": [], "work_type": "warehouse"},
+    {"site_id": "s1", "customer_name": "Smith", "needed_crafts": ["electrician"], "needs": ["outdoor"]},
+    {"site_id": "wh", "customer_name": "—", "needed_crafts": [], "needs": ["indoor"]},
 ]
 ASSIGNED = [{"row": 2, "person_id": "p1", "site_id": "s1", "note": ""}]
 

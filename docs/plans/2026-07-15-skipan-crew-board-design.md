@@ -15,14 +15,14 @@ This is a demo-tier showcase in the established posture: no auth, keyless Worklo
 
 ## Non-goals (this phase)
 
-- No inventory/warehouse model (Track B — likely a later `work_type=warehouse` enrichment or a sibling service).
+- No inventory/warehouse model (Track B — likely a later enrichment on indoor-only logistics sites or a sibling service).
 - No Leidangr entity provider or live catalog sync — but the repo ships a `catalog-info.yaml` Component entry from day one so the future reflection is file-cheap.
 - No muster-call/issue integration, no auth, no push/webhooks, no persisted plan history (a plan is a transient proposal; only applied assignments persist).
 
 ## Data model (one new spreadsheet, four tabs)
 
 - `Crews`: `person_id`, `name`, `crafts` (csv, the Guildhall craft vocabulary doing real work), `crew`
-- `Sites`: `site_id`, `customer_name`, `address`, `lat`, `lon`, `work_type` (`outdoor` | `indoor` | `warehouse`), `needed_crafts` (csv), `notes`, `job_name` (optional card headline; falls back to `customer_name`, then `site_id`)
+- `Sites`: `site_id`, `customer_name`, `address`, `lat`, `lon`, `site_needs` (csv of `indoor`/`outdoor`, one or both; blank defaults to `outdoor` — a warehouse is an indoor-only site with a logistics job), `needed_crafts` (csv), `notes`, `job_name` (optional card headline; falls back to `customer_name`, then `site_id`)
 - `Assignments` (the board state): `date`, `person_id`, `site_id`, `note` — one row per person per date
 - `Days`: `date`, `condition_override` (empty | `clear` | `rain` | …), `note` — the demo control; an override always beats the forecast
 
@@ -48,7 +48,7 @@ One structured-output call (`PLAN_SCHEMA`: `moves[]` of `{person_id, from_site, 
 
 The **verifier** is the UNMATCHED sibling — pure functions, no I/O:
 
-- `person_id` exists in Crews; `from_site` matches the person's current assignment (empty `from_site` is valid exactly when the person has no assignment row that date — applying then inserts a row instead of updating one); `to_site` exists in Sites (a warehouse is just a site with `work_type=warehouse`, no special case)
+- `person_id` exists in Crews; `from_site` matches the person's current assignment (empty `from_site` is valid exactly when the person has no assignment row that date — applying then inserts a row instead of updating one); `to_site` exists in Sites (a warehouse is just an indoor-only site, no special case)
 - No person ends the day double-booked after the full move-set is applied
 - Craft coverage: for each site, `needed_crafts` vs post-move present crafts — gaps annotate the move-set as warnings (visible, non-blocking); nonexistent people/sites mark the move `invalid` (blocking)
 

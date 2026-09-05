@@ -80,7 +80,7 @@ def _load_day(settings: Settings, sheets, http_get_json, date: str) -> dict:
         if has_coords:
             precip = weather.fetch_precip_probability(http_get_json, site["lat"], site["lon"], date)
             conditions[site["site_id"]] = weather.resolve_condition(override, precip, settings.rain_threshold)
-        elif site["work_type"] == "outdoor":
+        elif "outdoor" in site["needs"]:
             conditions[site["site_id"]] = weather.resolve_condition(override, None, settings.rain_threshold)
         elif override:
             conditions[site["site_id"]] = override
