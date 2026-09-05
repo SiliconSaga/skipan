@@ -15,6 +15,9 @@ def test_board_renders_sites_people_weather_and_flags(client):
     assert "<th>Notes</th><td>SPAN panel job</td>" in page
     assert "<h2>wh " in page                        # no job name and "-" customer falls back to site_id
     assert "Crew today:" in page and "nobody assigned" in page
+    assert '"p1": "Ada"' in page                    # id-to-name maps ship to the plan renderer
+    assert '"s1": "Rasmus electrical panel overhaul"' in page
+    assert "Apply checked moves" in page
 
 
 def test_condition_override_wins_on_next_render(client):

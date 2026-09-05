@@ -72,6 +72,8 @@ def _valid_date(value: str) -> str:
 def _load_day(settings: Settings, sheets, http_get_json, date: str) -> dict:
     crews = board.read_crews(sheets, settings.board_sheet_id)
     sites = board.read_sites(sheets, settings.board_sheet_id)
+    for site in sites:
+        site["display"] = board.display_name(site)
     assignments = board.read_assignments(sheets, settings.board_sheet_id, date)
     override = board.read_condition_override(sheets, settings.board_sheet_id, date)
     conditions = {}
@@ -128,10 +130,13 @@ def board_page(
         person = crew_by_id.get(assignment["person_id"], {"person_id": assignment["person_id"], "name": assignment["person_id"], "crafts": []})
         people_by_site.setdefault(assignment["site_id"], []).append(person)
     unassigned = [c for c in data["crews"] if c["person_id"] not in {a["person_id"] for a in data["assignments"]}]
+    person_names = {c["person_id"]: c["name"] or c["person_id"] for c in data["crews"]}
+    site_names = {s["site_id"]: s["display"] for s in data["sites"]}
     return templates.TemplateResponse(
         request, "board.html",
         {"date": day, "sites": data["sites"], "people_by_site": people_by_site, "unassigned": unassigned,
-         "conditions": data["conditions"], "flags": data["flags"], "flags_error": data["flags_error"]},
+         "conditions": data["conditions"], "flags": data["flags"], "flags_error": data["flags_error"],
+         "person_names": person_names, "site_names": site_names},
     )
 
 

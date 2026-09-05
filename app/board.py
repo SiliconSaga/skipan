@@ -27,6 +27,11 @@ def _coord(value: str):
     return coord if math.isfinite(coord) else None
 
 
+def display_name(site: dict) -> str:
+    customer = site["customer_name"] if site["customer_name"] not in ("-", "—") else ""
+    return site["job_name"] or customer or site["site_id"]
+
+
 def read_crews(sheets, sid: str) -> list[dict]:
     out = []
     for row in read_values(sheets, sid, CREWS_RANGE):

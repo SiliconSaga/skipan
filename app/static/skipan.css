@@ -20,5 +20,7 @@ button { padding: .7rem 1rem; border: 0; border-radius: 6px; background: #1d4ed8
 button:disabled { background: #a8a29e; }
 li small { color: #78716c; }
 .move { border: 1px solid #d6d3d1; border-radius: 6px; padding: .5rem; margin: .4rem 0; }
+.move label { display: block; }
+.reason { color: #57534e; font-size: .85rem; margin: .15rem 0 0 1.5rem; }
 .move.invalid { opacity: .55; text-decoration: line-through; }
 .issues { color: #b91c1c; font-size: .85rem; }

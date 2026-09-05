@@ -12,7 +12,7 @@
   {% for site in sites %}
   {% set customer = site.customer_name if site.customer_name and site.customer_name not in ["-", "—"] else "" %}
   <section class="site">
-    <h2>{{ site.job_name or customer or site.site_id }} <small class="sid">{{ site.site_id }}</small></h2>
+    <h2>{{ site.display }} <small class="sid">{{ site.site_id }}</small></h2>
     <table class="meta">
       {% if customer %}<tr><th>Customer</th><td>{{ customer }}</td></tr>{% endif %}
       {% if site.address %}<tr><th>Address</th><td>{{ site.address }}</td></tr>{% endif %}
@@ -46,11 +46,14 @@
     </label>
     <button id="suggest">Suggest a plan</button>
     <div id="plan"></div>
-    <button id="apply" hidden>Apply valid moves</button>
+    <button id="apply" hidden>Apply checked moves</button>
   </section>
 <script>
 const boardDate = "{{ date }}";
-let currentMoves = [];
+const personNames = {{ person_names|tojson }};
+const siteNames = {{ site_names|tojson }};
+const siteLabel = (id) => id ? (siteNames[id] || id) : "(unassigned)";
+let lastMoves = [];
 document.getElementById("condition").addEventListener("change", async (event) => {
   await fetch("/api/v1/condition", { method: "POST", headers: {"Content-Type": "application/json"},
     body: JSON.stringify({ date: boardDate, condition: event.target.value }) });
@@ -70,11 +73,26 @@ document.getElementById("suggest").addEventListener("click", async () => {
   const summary = document.createElement("p");
   summary.textContent = data.summary;
   planDiv.appendChild(summary);
-  currentMoves = data.moves.filter(m => m.valid);
-  for (const move of data.moves) {
+  lastMoves = data.moves;
+  for (const [index, move] of data.moves.entries()) {
     const div = document.createElement("div");
     div.className = "move" + (move.valid ? "" : " invalid");
-    div.textContent = `${move.person_id}: ${move.from_site || "(unassigned)"} → ${move.to_site} — ${move.reason}`;
+    const label = document.createElement("label");
+    const box = document.createElement("input");
+    box.type = "checkbox";
+    box.className = "pick";
+    box.checked = move.valid;
+    box.disabled = !move.valid;
+    box.dataset.index = index;
+    label.appendChild(box);
+    label.append(` ${personNames[move.person_id] || move.person_id}: ${siteLabel(move.from_site)} → ${siteLabel(move.to_site)}`);
+    div.appendChild(label);
+    if (move.reason) {
+      const why = document.createElement("div");
+      why.className = "reason";
+      why.textContent = move.reason;
+      div.appendChild(why);
+    }
     if (!move.valid) {
       const issues = document.createElement("div");
       issues.className = "issues";
@@ -89,11 +107,13 @@ document.getElementById("suggest").addEventListener("click", async () => {
     div.textContent = "warning: " + warning;
     planDiv.appendChild(div);
   }
-  document.getElementById("apply").hidden = currentMoves.length === 0;
+  document.getElementById("apply").hidden = !data.moves.some(m => m.valid);
 });
 document.getElementById("apply").addEventListener("click", async () => {
+  const picked = [...document.querySelectorAll("input.pick:checked")].map(box => lastMoves[box.dataset.index]);
+  if (picked.length === 0) { document.getElementById("plan").textContent = "No moves selected."; return; }
   const resp = await fetch("/api/v1/apply", { method: "POST", headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ date: boardDate, moves: currentMoves }) });
+    body: JSON.stringify({ date: boardDate, moves: picked }) });
   if (!resp.ok) { document.getElementById("plan").textContent = "Apply failed: " + (await resp.text()); return; }
   location.reload();
 });
