@@ -33,7 +33,7 @@ class FakeValues:
         self._result = {}
         return self
 
-    def execute(self):
+    def execute(self, num_retries=0):
         return self._result
 
 

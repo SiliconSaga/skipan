@@ -74,12 +74,12 @@ def apply_moves(sheets, sid: str, date: str, moves: list[dict]) -> int:
             sheets.spreadsheets().values().update(
                 spreadsheetId=sid, range=f"{ASSIGN_TAB}!C{existing['row']}", valueInputOption="RAW",
                 body={"values": [[to_site]]},
-            ).execute()
+            ).execute(num_retries=2)
         else:
             sheets.spreadsheets().values().append(
                 spreadsheetId=sid, range=ASSIGN_RANGE, valueInputOption="RAW",
                 body={"values": [[date, person, to_site, ""]]},
-            ).execute()
+            ).execute(num_retries=2)
         applied += 1
     return applied
 
@@ -90,8 +90,8 @@ def set_condition(sheets, sid: str, date: str, condition: str) -> None:
             sheets.spreadsheets().values().update(
                 spreadsheetId=sid, range=f"{DAYS_TAB}!B{index + 2}", valueInputOption="RAW",
                 body={"values": [[condition]]},
-            ).execute()
+            ).execute(num_retries=2)
             return
     sheets.spreadsheets().values().append(
         spreadsheetId=sid, range=DAYS_RANGE, valueInputOption="RAW", body={"values": [[date, condition, ""]]}
-    ).execute()
+    ).execute(num_retries=2)

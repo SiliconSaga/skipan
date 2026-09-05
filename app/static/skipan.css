@@ -5,6 +5,10 @@ h1 { font-size: 1.3rem; }
 section.site { background: #fff; border: 1px solid #d6d3d1; border-radius: 8px; padding: .8rem; margin: .8rem 0; }
 section.site h2 { font-size: 1.05rem; margin: 0 0 .3rem; }
 .badge { display: inline-block; padding: .1rem .5rem; border-radius: 999px; font-size: .8rem; background: #e7e5e4; }
+.chip { display: inline-block; padding: .05rem .45rem; border-radius: 4px; font-size: .72rem; text-transform: uppercase; letter-spacing: .03em; background: #e7e5e4; color: #57534e; vertical-align: middle; }
+.sid { color: #a8a29e; font-weight: normal; font-size: .75rem; }
+.addr { margin: .1rem 0 .3rem; color: #57534e; font-size: .9rem; }
+.notes { margin: .1rem 0 .4rem; font-size: .9rem; }
 .badge.rain-risk, .badge.rain { background: #dbeafe; color: #1d4ed8; }
 .badge.unknown { background: #fef3c7; }
 .flag { background: #fef3c7; border: 1px solid #f59e0b; padding: .4rem .6rem; border-radius: 6px; font-size: .9rem; }

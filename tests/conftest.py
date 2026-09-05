@@ -20,7 +20,7 @@ def seed_stores():
                 ["p3", "Cy", "apprentice", "beta"],
             ],
             "Sites": [
-                ["s1", "Rasmus", "1 Main St", "40.79", "-74.25", "outdoor", "electrician", ""],
+                ["s1", "Rasmus", "1 Main St", "40.79", "-74.25", "outdoor", "electrician", "SPAN panel job"],
                 ["s2", "Jones", "2 Oak Ave", "", "", "indoor", "", ""],
                 ["wh", "-", "Depot", "", "", "warehouse", "", ""],
             ],

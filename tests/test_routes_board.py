@@ -8,6 +8,9 @@ def test_board_renders_sites_people_weather_and_flags(client):
     assert "rain-risk" in page                      # outdoor site with 80% forecast
     assert "span-quote.pdf" in page and "500.00" in page  # amendment flag on Rasmus site
     assert "Depot" in page
+    assert '<span class="chip">outdoor</span>' in page and '<span class="chip">warehouse</span>' in page
+    assert "SPAN panel job" in page                 # site notes line
+    assert "<h2>wh " in page                        # "-" placeholder customer falls back to site_id
 
 
 def test_condition_override_wins_on_next_render(client):
@@ -22,8 +25,17 @@ def test_coordless_outdoor_site_shows_unknown_badge(client, fakes):
         ["s9", "Reyes", "9 Elm Rd", "", "", "outdoor", "", ""]
     )
     page = client.get("/?date=2026-07-17").text
-    section = page.split("s9 — Reyes")[1].split("</section>")[0]
+    section = page.split("Reyes")[1].split("</section>")[0]
     assert "badge unknown" in section
+
+
+def test_any_site_with_coords_gets_forecast_badge(client, fakes):
+    fakes["sheets"].stores["board123"]["Sites"].append(
+        ["yard", "Yard", "9 Dock St", "40.70", "-74.10", "warehouse", "", ""]
+    )
+    page = client.get("/?date=2026-07-17").text
+    section = page.split("Yard")[1].split("</section>")[0]
+    assert "badge rain-risk" in section  # 80% fake forecast applies beyond outdoor sites
 
 
 def test_board_survives_broken_skipta_sheet(client, fakes):

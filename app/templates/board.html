@@ -9,9 +9,11 @@
   <h1>Skipan — {{ date }}</h1>
   {% if flags_error %}<p class="warn">Amendment feed unavailable — flags omitted.</p>{% endif %}
   {% for site in sites %}
+  {% set display_name = site.customer_name if site.customer_name and site.customer_name not in ["-", "—"] else site.site_id %}
   <section class="site">
-    <h2>{{ site.site_id }} — {{ site.customer_name }} <small>{{ site.address }}</small></h2>
-    {% if conditions.get(site.site_id) %}<span class="badge {{ conditions[site.site_id] }}">{{ conditions[site.site_id] }}</span>{% endif %}
+    <h2>{{ display_name }} <span class="chip">{{ site.work_type }}</span>{% if site.site_id != display_name|lower %} <small class="sid">{{ site.site_id }}</small>{% endif %}</h2>
+    {% if site.address or conditions.get(site.site_id) %}<p class="addr">{{ site.address }}{% if conditions.get(site.site_id) %} <span class="badge {{ conditions[site.site_id] }}">{{ conditions[site.site_id] }}</span>{% endif %}</p>{% endif %}
+    {% if site.notes %}<p class="notes">{{ site.notes }}</p>{% endif %}
     {% for flag in flags.get(site.site_id, []) %}
     <p class="flag">scope +{{ "%.2f"|format(flag.total) }} — {{ flag.proposal_name }}</p>
     {% endfor %}
