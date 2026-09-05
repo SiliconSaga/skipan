@@ -46,6 +46,7 @@ def test_build_context_is_compact_and_complete():
     )
     assert context["date"] == "2026-07-17"
     assert context["people"] == [{"person_id": "p1", "crafts": ["electrician"], "assigned_to": "s1"}]
+    assert context["sites"][0]["needs"] == ["outdoor"]
     assert context["sites"][0]["condition"] == "rain-risk"
     assert context["sites"][0]["scope_changes"] == [{"proposal_name": "span.pdf", "total": 500.0}]
 

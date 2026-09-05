@@ -39,6 +39,14 @@ def test_reads_and_updates_retry_but_appends_never_do():
     assert all(retries == 2 for verb, retries in calls if verb in ("get", "update"))
     assert all(retries == 0 for verb, retries in calls if verb == "append")  # a retried append can duplicate rows
 
+    sheets.values().calls.clear()
+    set_condition(sheets, BOARD, "2026-07-16", "rain")
+    assert sheets.values().calls == [("get", 2), ("update", 2)]
+
+    sheets.values().calls.clear()
+    set_condition(sheets, BOARD, "2026-07-18", "clear")
+    assert sheets.values().calls == [("get", 2), ("append", 0)]
+
 
 def test_set_condition_updates_then_appends():
     sheets = make_sheets()
