@@ -4,7 +4,7 @@ import math
 from app.google_clients import read_values
 
 CREWS_RANGE = "Crews!A2:D"
-SITES_RANGE = "Sites!A2:H"
+SITES_RANGE = "Sites!A2:I"
 ASSIGN_TAB = "Assignments"
 ASSIGN_RANGE = f"{ASSIGN_TAB}!A2:D"
 DAYS_TAB = "Days"
@@ -38,11 +38,11 @@ def read_crews(sheets, sid: str) -> list[dict]:
 def read_sites(sheets, sid: str) -> list[dict]:
     out = []
     for row in read_values(sheets, sid, SITES_RANGE):
-        p = _pad(row, 8)
+        p = _pad(row, 9)
         out.append({
             "site_id": p[0], "customer_name": p[1], "address": p[2],
             "lat": _coord(p[3]), "lon": _coord(p[4]), "work_type": p[5] or "outdoor",
-            "needed_crafts": _csv(p[6]), "notes": p[7],
+            "needed_crafts": _csv(p[6]), "notes": p[7], "job_name": p[8],
         })
     return out
 

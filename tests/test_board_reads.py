@@ -41,6 +41,7 @@ def test_read_sites_parses_coords_and_lists():
     assert sites[1]["lat"] is None and sites[1]["needed_crafts"] == []
     assert sites[2]["lat"] is None and sites[2]["lon"] == -74.25  # unparseable coord degrades, not 500s
     assert sites[3]["work_type"] == "warehouse"
+    assert sites[0]["job_name"] == ""  # 8-column row pads the optional job_name
 
 
 def test_non_finite_coords_degrade_to_none():

@@ -8,9 +8,12 @@ def test_board_renders_sites_people_weather_and_flags(client):
     assert "rain-risk" in page                      # outdoor site with 80% forecast
     assert "span-quote.pdf" in page and "500.00" in page  # amendment flag on Rasmus site
     assert "Depot" in page
-    assert '<span class="chip">outdoor</span>' in page and '<span class="chip">warehouse</span>' in page
-    assert "SPAN panel job" in page                 # site notes line
-    assert "<h2>wh " in page                        # "-" placeholder customer falls back to site_id
+    assert "Rasmus electrical panel overhaul" in page  # job_name headline
+    assert "<th>Site needs</th><td>outdoor</td>" in page and "<th>Site needs</th><td>warehouse</td>" in page
+    assert "<th>Staff needed</th><td>electrician</td>" in page
+    assert "<th>Notes</th><td>SPAN panel job</td>" in page
+    assert "<h2>wh " in page                        # no job name and "-" customer falls back to site_id
+    assert "Crew today:" in page and "nobody assigned" in page
 
 
 def test_condition_override_wins_on_next_render(client):
@@ -25,7 +28,7 @@ def test_coordless_outdoor_site_shows_unknown_badge(client, fakes):
         ["s9", "Reyes", "9 Elm Rd", "", "", "outdoor", "", ""]
     )
     page = client.get("/?date=2026-07-17").text
-    section = page.split("Reyes")[1].split("</section>")[0]
+    section = page.split('sid">s9</small>')[1].split("</section>")[0]
     assert "badge unknown" in section
 
 
@@ -34,7 +37,7 @@ def test_any_site_with_coords_gets_forecast_badge(client, fakes):
         ["yard", "Yard", "9 Dock St", "40.70", "-74.10", "warehouse", "", ""]
     )
     page = client.get("/?date=2026-07-17").text
-    section = page.split("Yard")[1].split("</section>")[0]
+    section = page.split('sid">yard</small>')[1].split("</section>")[0]
     assert "badge rain-risk" in section  # 80% fake forecast applies beyond outdoor sites
 
 

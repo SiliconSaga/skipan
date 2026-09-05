@@ -22,7 +22,7 @@ This is a demo-tier showcase in the established posture: no auth, keyless Worklo
 ## Data model (one new spreadsheet, four tabs)
 
 - `Crews`: `person_id`, `name`, `crafts` (csv, the Guildhall craft vocabulary doing real work), `crew`
-- `Sites`: `site_id`, `customer_name`, `address`, `lat`, `lon`, `work_type` (`outdoor` | `indoor` | `warehouse`), `needed_crafts` (csv), `notes`
+- `Sites`: `site_id`, `customer_name`, `address`, `lat`, `lon`, `work_type` (`outdoor` | `indoor` | `warehouse`), `needed_crafts` (csv), `notes`, `job_name` (optional card headline; falls back to `customer_name`, then `site_id`)
 - `Assignments` (the board state): `date`, `person_id`, `site_id`, `note` — one row per person per date
 - `Days`: `date`, `condition_override` (empty | `clear` | `rain` | …), `note` — the demo control; an override always beats the forecast
 
