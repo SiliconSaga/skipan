@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skipan
+  namespace: skipan
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: skipan}
+  template:
+    metadata:
+      labels: {app: skipan}
+    spec:
+      serviceAccountName: skipan-sa
+      containers:
+      - name: skipan
+        image: ghcr.io/siliconsaga/skipan:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: GCP_PROJECT_ID
+          valueFrom: {configMapKeyRef: {name: skipan-config, key: gcp_project_id}}
+        - name: GCP_REGION
+          valueFrom: {configMapKeyRef: {name: skipan-config, key: gcp_region}}
+        - name: SKIPAN_BOARD_SHEET_ID
+          valueFrom: {configMapKeyRef: {name: skipan-config, key: board_sheet_id}}
+        - name: SKIPAN_SKIPTA_SHEET_ID
+          valueFrom: {configMapKeyRef: {name: skipan-config, key: skipta_sheet_id}}
+        - name: SKIPAN_BASE_URL
+          valueFrom: {configMapKeyRef: {name: skipan-config, key: base_url}}
+        - name: SKIPAN_RAIN_THRESHOLD
+          valueFrom: {configMapKeyRef: {name: skipan-config, key: rain_threshold}}
+        - name: SKIPAN_LOOKBACK_DAYS
+          valueFrom: {configMapKeyRef: {name: skipan-config, key: lookback_days}}
+        readinessProbe:
+          httpGet: {path: /healthz, port: 8000}
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: {path: /healthz, port: 8000}
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        resources:
+          requests: {cpu: 100m, memory: 256Mi}
+          limits: {cpu: 250m, memory: 512Mi}

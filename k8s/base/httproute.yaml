@@ -1,0 +1,23 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: skipan
+  namespace: skipan
+spec:
+  parentRefs:
+  - name: traefik-gateway
+    namespace: kube-system
+    kind: Gateway
+    sectionName: web
+  - name: traefik-gateway
+    namespace: kube-system
+    kind: Gateway
+    sectionName: websecure
+  hostnames:
+  - "skipan.cmdbee.org"
+  rules:
+  - matches:
+    - path: {type: PathPrefix, value: "/"}
+    backendRefs:
+    - name: skipan
+      port: 80
