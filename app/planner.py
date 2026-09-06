@@ -50,8 +50,9 @@ PROMPT = (
     "needs include outdoor is weather-exposed, and in rain or rain-risk conditions prefer moving people off sites "
     "whose only need is outdoor onto sites with indoor work. Move ONLY people listed in the context, ONLY between "
     "sites listed in the context, prefer moves that keep each site's needed crafts covered, use an empty from_site "
-    "exactly when the person is currently unassigned, and give a one-sentence reason per move. Propose no move when "
-    "none is needed.\n\nContext:\n{context}"
+    "exactly when the person is currently unassigned, and give a one-sentence reason per move. In every reason and in "
+    "the summary refer to people and sites by their name and job fields, never by ids; ids belong only in the "
+    "person_id, from_site, and to_site fields. Propose no move when none is needed.\n\nContext:\n{context}"
 )
 
 
@@ -60,12 +61,14 @@ def build_context(date: str, crews, sites, assignments, flags, conditions) -> di
     return {
         "date": date,
         "people": [
-            {"person_id": c["person_id"], "crafts": c["crafts"], "assigned_to": assigned_to.get(c["person_id"], "")}
+            {"person_id": c["person_id"], "name": c.get("name") or c["person_id"], "crafts": c["crafts"],
+             "assigned_to": assigned_to.get(c["person_id"], "")}
             for c in crews
         ],
         "sites": [
             {
-                "site_id": s["site_id"], "needs": s["needs"], "needed_crafts": s["needed_crafts"],
+                "site_id": s["site_id"], "job": s.get("display") or s["site_id"],
+                "needs": s["needs"], "needed_crafts": s["needed_crafts"],
                 "condition": conditions.get(s["site_id"], "clear"),
                 "scope_changes": flags.get(s["site_id"], []),
             }

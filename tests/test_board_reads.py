@@ -1,4 +1,4 @@
-from app.board import read_assignments, read_condition_override, read_crews, read_sites
+from app.board import display_name, read_assignments, read_condition_override, read_crews, read_sites
 from tests.fakes import FakeSheets
 
 BOARD = "board123"
@@ -43,6 +43,12 @@ def test_read_sites_parses_coords_and_lists():
     assert sites[2]["lat"] is None and sites[2]["lon"] == -74.25  # unparseable coord degrades, not 500s
     assert sites[3]["needs"] == ["outdoor"]  # blank needs default
     assert sites[0]["job_name"] == ""  # 8-column row pads the optional job_name
+
+
+def test_display_name_prefers_job_then_customer_then_id():
+    assert display_name({"job_name": "Panel job", "customer_name": "Smith", "site_id": "s1"}) == "Panel job"
+    assert display_name({"job_name": "", "customer_name": "Smith", "site_id": "s1"}) == "Smith"
+    assert display_name({"job_name": "", "customer_name": "-", "site_id": "wh"}) == "wh"
 
 
 def test_non_finite_coords_degrade_to_none():
