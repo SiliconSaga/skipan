@@ -18,6 +18,7 @@ def test_board_renders_sites_people_weather_and_flags(client):
     assert '"p1": "Ada"' in page                    # id-to-name maps ship to the plan renderer
     assert '"s1": "Rasmus electrical panel overhaul"' in page
     assert "Apply checked moves" in page
+    assert 'id="apply-note"' in page  # apply messages land beside the button, not over the plan
 
 
 def test_condition_override_wins_on_next_render(client):
