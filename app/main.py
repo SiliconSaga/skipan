@@ -1,4 +1,5 @@
 """Skipan — crew board. Routes only; logic lives in the sibling modules."""
+
 import logging
 import os
 import threading
@@ -18,7 +19,9 @@ from app import amendments_feed, board, planner, verifier, weather
 from app.config import Settings
 from app.google_clients import build_sheets, get_credentials, make_model_factory
 
-logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper(), format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO").upper(), format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
 logger = logging.getLogger("skipan")
 
 app = FastAPI(title="Skipan")
@@ -56,7 +59,10 @@ def get_plan():
     def _plan(context: dict, settings: Settings):
         factory = make_model_factory(settings.project_id, settings.region)
         return planner.suggest_plan(
-            context, model_factory=factory, model_names=settings.model_names, max_output_tokens=settings.max_output_tokens
+            context,
+            model_factory=factory,
+            model_names=settings.model_names,
+            max_output_tokens=settings.max_output_tokens,
         )
 
     return _plan
@@ -95,8 +101,14 @@ def _load_day(settings: Settings, sheets, http_get_json, date: str) -> dict:
     except Exception as exc:  # the feed is an enrichment — never take the board down
         logger.warning("amendment feed unavailable: %s", exc)
         flags_error = True
-    return {"crews": crews, "sites": sites, "assignments": assignments, "flags": flags,
-            "conditions": conditions, "flags_error": flags_error}
+    return {
+        "crews": crews,
+        "sites": sites,
+        "assignments": assignments,
+        "flags": flags,
+        "conditions": conditions,
+        "flags_error": flags_error,
+    }
 
 
 class ConditionRequest(BaseModel):
@@ -127,16 +139,30 @@ def board_page(
     people_by_site: dict[str, list[dict]] = {}
     crew_by_id = {c["person_id"]: c for c in data["crews"]}
     for assignment in data["assignments"]:
-        person = crew_by_id.get(assignment["person_id"], {"person_id": assignment["person_id"], "name": assignment["person_id"], "crafts": []})
+        person = crew_by_id.get(
+            assignment["person_id"],
+            {"person_id": assignment["person_id"], "name": assignment["person_id"], "crafts": []},
+        )
         people_by_site.setdefault(assignment["site_id"], []).append(person)
-    unassigned = [c for c in data["crews"] if c["person_id"] not in {a["person_id"] for a in data["assignments"]}]
+    unassigned = [
+        c for c in data["crews"] if c["person_id"] not in {a["person_id"] for a in data["assignments"]}
+    ]
     person_names = {c["person_id"]: c["name"] or c["person_id"] for c in data["crews"]}
     site_names = {s["site_id"]: s["display"] for s in data["sites"]}
     return templates.TemplateResponse(
-        request, "board.html",
-        {"date": day, "sites": data["sites"], "people_by_site": people_by_site, "unassigned": unassigned,
-         "conditions": data["conditions"], "flags": data["flags"], "flags_error": data["flags_error"],
-         "person_names": person_names, "site_names": site_names},
+        request,
+        "board.html",
+        {
+            "date": day,
+            "sites": data["sites"],
+            "people_by_site": people_by_site,
+            "unassigned": unassigned,
+            "conditions": data["conditions"],
+            "flags": data["flags"],
+            "flags_error": data["flags_error"],
+            "person_names": person_names,
+            "site_names": site_names,
+        },
     )
 
 
@@ -181,12 +207,16 @@ def suggest(
 ):
     day = _valid_date(body.date)
     data = _load_day(settings, sheets, http_get_json, day)
-    context = planner.build_context(day, data["crews"], data["sites"], data["assignments"], data["flags"], data["conditions"])
+    context = planner.build_context(
+        day, data["crews"], data["sites"], data["assignments"], data["flags"], data["conditions"]
+    )
     try:
         plan = plan_fn(context, settings)
     except planner.PlanError as exc:
         raise HTTPException(status_code=502, detail=f"Could not draft a plan: {exc}") from exc
-    verified = verifier.verify_moves([m.model_dump() for m in plan.moves], data["crews"], data["sites"], data["assignments"])
+    verified = verifier.verify_moves(
+        [m.model_dump() for m in plan.moves], data["crews"], data["sites"], data["assignments"]
+    )
     warnings = verifier.coverage_warnings(data["crews"], data["sites"], data["assignments"], verified)
     return {"summary": plan.summary, "moves": [v.as_dict() for v in verified], "warnings": warnings}
 
@@ -206,7 +236,14 @@ def apply(
     verified = verifier.verify_moves([m.model_dump() for m in body.moves], crews, sites, assignments)
     invalid = [v.as_dict() for v in verified if not v.valid]
     if invalid:
-        raise HTTPException(status_code=422, detail={"message": "invalid moves — nothing applied", "moves": invalid})
-    applied = board.apply_moves(sheets, settings.board_sheet_id, day, [{"person_id": v.person_id, "to_site": v.to_site} for v in verified])
+        raise HTTPException(
+            status_code=422, detail={"message": "invalid moves — nothing applied", "moves": invalid}
+        )
+    applied = board.apply_moves(
+        sheets,
+        settings.board_sheet_id,
+        day,
+        [{"person_id": v.person_id, "to_site": v.to_site} for v in verified],
+    )
     logger.info("applied %d moves on %s", applied, day)
     return {"applied": applied}

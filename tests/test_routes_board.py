@@ -5,17 +5,19 @@ def test_healthz(client):
 def test_board_renders_sites_people_weather_and_flags(client):
     page = client.get("/?date=2026-07-17").text
     assert "Ada" in page and "Bo" in page
-    assert "rain-risk" in page                      # outdoor site with 80% forecast
+    assert "rain-risk" in page  # outdoor site with 80% forecast
     assert "span-quote.pdf" in page and "500.00" in page  # amendment flag on Rasmus site
     assert "Depot" in page
     assert "Rasmus electrical panel overhaul" in page  # job_name headline
-    assert '<span class="need">☑ indoor</span> <span class="need">☑ outdoor</span>' in page  # both checked on s1
+    assert (
+        '<span class="need">☑ indoor</span> <span class="need">☑ outdoor</span>' in page
+    )  # both checked on s1
     assert '<span class="need">☑ indoor</span> <span class="need">☐ outdoor</span>' in page  # indoor-only wh
     assert "<th>Staff needed</th><td>electrician</td>" in page
     assert "<th>Notes</th><td>SPAN panel job</td>" in page
-    assert "<h2>wh " in page                        # no job name and "-" customer falls back to site_id
+    assert "<h2>wh " in page  # no job name and "-" customer falls back to site_id
     assert "Crew today:" in page and "nobody assigned" in page
-    assert '"p1": "Ada"' in page                    # id-to-name maps ship to the plan renderer
+    assert '"p1": "Ada"' in page  # id-to-name maps ship to the plan renderer
     assert '"s1": "Rasmus electrical panel overhaul"' in page
     assert "Apply checked moves" in page
     assert 'id="apply-note"' in page  # apply messages land beside the button, not over the plan
@@ -29,9 +31,7 @@ def test_condition_override_wins_on_next_render(client):
 
 
 def test_coordless_outdoor_site_shows_unknown_badge(client, fakes):
-    fakes["sheets"].stores["board123"]["Sites"].append(
-        ["s9", "Reyes", "9 Elm Rd", "", "", "outdoor", "", ""]
-    )
+    fakes["sheets"].stores["board123"]["Sites"].append(["s9", "Reyes", "9 Elm Rd", "", "", "outdoor", "", ""])
     page = client.get("/?date=2026-07-17").text
     section = page.split('sid">s9</small>')[1].split("</section>")[0]
     assert "badge unknown" in section

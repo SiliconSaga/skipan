@@ -1,4 +1,5 @@
 """Environment-driven settings. A .env at the component root is honored for local dev."""
+
 import os
 from dataclasses import dataclass, field
 
@@ -30,7 +31,9 @@ class Settings:
             board_sheet_id=os.getenv("SKIPAN_BOARD_SHEET_ID", ""),
             skipta_sheet_id=os.getenv("SKIPAN_SKIPTA_SHEET_ID", ""),
             base_url=os.getenv("SKIPAN_BASE_URL", "http://localhost:8001"),
-            model_names=[m.strip() for m in os.getenv("SKIPAN_MODEL_NAMES", DEFAULT_MODELS).split(",") if m.strip()],
+            model_names=[
+                m.strip() for m in os.getenv("SKIPAN_MODEL_NAMES", DEFAULT_MODELS).split(",") if m.strip()
+            ],
             max_output_tokens=int(os.getenv("MAX_OUTPUT_TOKENS", "1024")),
             rate_limit_per_minute=int(os.getenv("RATE_LIMIT_PER_MINUTE", "10")),
             rain_threshold=int(os.getenv("SKIPAN_RAIN_THRESHOLD", "50")),

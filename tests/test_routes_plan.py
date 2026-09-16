@@ -22,15 +22,22 @@ def test_suggest_flags_hallucinated_person(client, fakes):
 
 
 def test_apply_moves_and_reject_invalid(client, fakes):
-    ok = client.post("/api/v1/apply", json={"date": "2026-07-17", "moves": [
-        {"person_id": "p1", "from_site": "s1", "to_site": "wh"}
-    ]})
+    ok = client.post(
+        "/api/v1/apply",
+        json={"date": "2026-07-17", "moves": [{"person_id": "p1", "from_site": "s1", "to_site": "wh"}]},
+    )
     assert ok.status_code == 200 and ok.json()["applied"] == 1
     rows = fakes["sheets"].stores["board123"]["Assignments"]
     assert ["2026-07-17", "p1", "wh", ""] in rows
-    bad = client.post("/api/v1/apply", json={"date": "2026-07-17", "moves": [
-        {"person_id": "p1", "from_site": "s1", "to_site": "wh"}  # stale from_site now
-    ]})
+    bad = client.post(
+        "/api/v1/apply",
+        json={
+            "date": "2026-07-17",
+            "moves": [
+                {"person_id": "p1", "from_site": "s1", "to_site": "wh"}  # stale from_site now
+            ],
+        },
+    )
     assert bad.status_code == 422
 
 
@@ -39,6 +46,7 @@ def test_planner_failure_is_502(client, fakes, monkeypatch):
         raise PlanError("all models failed")
 
     from app.main import app, get_plan
+
     app.dependency_overrides[get_plan] = lambda: boom
     resp = client.post("/api/v1/suggest", json={"date": "2026-07-17"})
     assert resp.status_code == 502

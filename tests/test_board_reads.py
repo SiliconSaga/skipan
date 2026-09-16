@@ -5,27 +5,38 @@ BOARD = "board123"
 
 
 def make_sheets():
-    return FakeSheets({
-        BOARD: {
-            "Crews": [
-                ["p1", "Ada", "electrician, apprentice", "alpha"],
-                ["p2", "Bo", "hvac", "alpha"],
-                ["p3", "Cy"],  # short row: no crafts, no crew
-            ],
-            "Sites": [
-                ["s1", "Smith", "1 Main St", "40.79", "-74.25", "indoor, outdoor", "electrician", "panel job"],
-                ["s2", "Jones", "2 Oak Ave", "", "", "indoor", "", ""],
-                ["s3", "Reyes", "3 Elm Rd", "40.79°N", "-74.25", "outdoor", "", ""],  # hand-typed coord
-                ["wh", "—", "Depot", "", "", "", "", ""],  # blank needs default to outdoor
-            ],
-            "Assignments": [
-                ["2026-07-16", "p1", "s1", ""],
-                ["2026-07-16", "p2", "s2", "second fix"],
-                ["2026-07-17", "p1", "wh", ""],
-            ],
-            "Days": [["2026-07-17", "rain", "forecast said so"]],
+    return FakeSheets(
+        {
+            BOARD: {
+                "Crews": [
+                    ["p1", "Ada", "electrician, apprentice", "alpha"],
+                    ["p2", "Bo", "hvac", "alpha"],
+                    ["p3", "Cy"],  # short row: no crafts, no crew
+                ],
+                "Sites": [
+                    [
+                        "s1",
+                        "Smith",
+                        "1 Main St",
+                        "40.79",
+                        "-74.25",
+                        "indoor, outdoor",
+                        "electrician",
+                        "panel job",
+                    ],
+                    ["s2", "Jones", "2 Oak Ave", "", "", "indoor", "", ""],
+                    ["s3", "Reyes", "3 Elm Rd", "40.79°N", "-74.25", "outdoor", "", ""],  # hand-typed coord
+                    ["wh", "—", "Depot", "", "", "", "", ""],  # blank needs default to outdoor
+                ],
+                "Assignments": [
+                    ["2026-07-16", "p1", "s1", ""],
+                    ["2026-07-16", "p2", "s2", "second fix"],
+                    ["2026-07-17", "p1", "wh", ""],
+                ],
+                "Days": [["2026-07-17", "rain", "forecast said so"]],
+            }
         }
-    })
+    )
 
 
 def test_read_crews_parses_crafts_and_pads():

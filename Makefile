@@ -9,5 +9,8 @@ test:
 lint:
 	$(PY) -m ruff check .
 
+format:
+	$(PY) -m ruff format .
+
 run:
 	$(PY) -m uvicorn app.main:app --reload --port 8001

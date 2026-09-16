@@ -1,4 +1,5 @@
 """open-meteo daily forecast (keyless) with soft failure; overrides always win."""
+
 import logging
 
 OPEN_METEO_URL = (

@@ -1,4 +1,5 @@
 """Deterministic gate for LLM-proposed moves — the UNMATCHED sibling. Pure functions, no I/O."""
+
 from collections import Counter
 from dataclasses import asdict, dataclass, field
 
@@ -16,7 +17,9 @@ class VerifiedMove:
         return asdict(self)
 
 
-def verify_moves(moves: list[dict], crews: list[dict], sites: list[dict], assignments: list[dict]) -> list[VerifiedMove]:
+def verify_moves(
+    moves: list[dict], crews: list[dict], sites: list[dict], assignments: list[dict]
+) -> list[VerifiedMove]:
     people = {c["person_id"] for c in crews}
     site_ids = {s["site_id"] for s in sites}
     current = {a["person_id"]: a["site_id"] for a in assignments}
@@ -34,14 +37,18 @@ def verify_moves(moves: list[dict], crews: list[dict], sites: list[dict], assign
         if person in people:
             actual = current.get(person, "")
             if from_site != actual:
-                issues.append(f"from_site {from_site or '(unassigned)'} does not match current {actual or '(unassigned)'}")
+                issues.append(
+                    f"from_site {from_site or '(unassigned)'} does not match current {actual or '(unassigned)'}"
+                )
         if counts[person] > 1:
             issues.append("duplicate move for person in this plan")
         out.append(VerifiedMove(person, from_site, to_site, move.get("reason", ""), not issues, issues))
     return out
 
 
-def coverage_warnings(crews: list[dict], sites: list[dict], assignments: list[dict], verified: list[VerifiedMove]) -> list[str]:
+def coverage_warnings(
+    crews: list[dict], sites: list[dict], assignments: list[dict], verified: list[VerifiedMove]
+) -> list[str]:
     post = {a["person_id"]: a["site_id"] for a in assignments}
     for move in verified:
         if move.valid:

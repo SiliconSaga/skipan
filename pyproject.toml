@@ -1,6 +1,9 @@
 [tool.ruff]
 line-length = 110
 target-version = "py311"
+# ruff 0.16+ formats Python fences inside Markdown, and dedents indented
+# snippets in the plan docs into broken code. Docs are prose, not sources.
+extend-exclude = ["docs"]
 
 [tool.ruff.lint]
 # Pinned to the pre-0.16 default set so unpinned ruff upgrades in CI can't shift the goalposts.

@@ -1,4 +1,5 @@
 """All Google client construction lives here; everything downstream takes injected clients."""
+
 import google.auth
 from googleapiclient.discovery import build
 
@@ -30,5 +31,10 @@ def make_model_factory(project_id: str, region: str):
 
 def read_values(sheets, spreadsheet_id: str, a1_range: str):
     # num_retries covers transient socket/SSL failures on Google's side (stale keep-alive connections).
-    result = sheets.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=a1_range).execute(num_retries=2)
+    result = (
+        sheets.spreadsheets()
+        .values()
+        .get(spreadsheetId=spreadsheet_id, range=a1_range)
+        .execute(num_retries=2)
+    )
     return result.get("values", [])

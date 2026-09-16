@@ -5,15 +5,17 @@ BOARD = "board123"
 
 
 def make_sheets():
-    return FakeSheets({
-        BOARD: {
-            "Assignments": [
-                ["2026-07-16", "p1", "s1", ""],
-                ["2026-07-16", "p2", "s2", "keep note"],
-            ],
-            "Days": [["2026-07-16", "", ""]],
+    return FakeSheets(
+        {
+            BOARD: {
+                "Assignments": [
+                    ["2026-07-16", "p1", "s1", ""],
+                    ["2026-07-16", "p2", "s2", "keep note"],
+                ],
+                "Days": [["2026-07-16", "", ""]],
+            }
         }
-    })
+    )
 
 
 def test_apply_moves_updates_existing_row_preserving_note():
@@ -33,11 +35,18 @@ def test_apply_moves_appends_for_unassigned_person():
 
 def test_reads_and_updates_retry_but_appends_never_do():
     sheets = make_sheets()
-    apply_moves(sheets, BOARD, "2026-07-16", [{"person_id": "p2", "to_site": "wh"}, {"person_id": "p9", "to_site": "s1"}])
+    apply_moves(
+        sheets,
+        BOARD,
+        "2026-07-16",
+        [{"person_id": "p2", "to_site": "wh"}, {"person_id": "p9", "to_site": "s1"}],
+    )
     calls = sheets.values().calls
     assert ("update", 2) in calls and ("append", 0) in calls
     assert all(retries == 2 for verb, retries in calls if verb in ("get", "update"))
-    assert all(retries == 0 for verb, retries in calls if verb == "append")  # a retried append can duplicate rows
+    assert all(
+        retries == 0 for verb, retries in calls if verb == "append"
+    )  # a retried append can duplicate rows
 
     sheets.values().calls.clear()
     set_condition(sheets, BOARD, "2026-07-16", "rain")

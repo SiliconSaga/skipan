@@ -1,4 +1,5 @@
 """One structured Gemini call proposes moves; it never writes. The verifier gates downstream."""
+
 import json
 import logging
 
@@ -32,7 +33,10 @@ PLAN_SCHEMA = {
                 "type": "OBJECT",
                 "properties": {
                     "person_id": {"type": "STRING"},
-                    "from_site": {"type": "STRING", "description": "Current site, empty when currently unassigned"},
+                    "from_site": {
+                        "type": "STRING",
+                        "description": "Current site, empty when currently unassigned",
+                    },
                     "to_site": {"type": "STRING"},
                     "reason": {"type": "STRING", "description": "One sentence"},
                 },
@@ -61,14 +65,20 @@ def build_context(date: str, crews, sites, assignments, flags, conditions) -> di
     return {
         "date": date,
         "people": [
-            {"person_id": c["person_id"], "name": c.get("name") or c["person_id"], "crafts": c["crafts"],
-             "assigned_to": assigned_to.get(c["person_id"], "")}
+            {
+                "person_id": c["person_id"],
+                "name": c.get("name") or c["person_id"],
+                "crafts": c["crafts"],
+                "assigned_to": assigned_to.get(c["person_id"], ""),
+            }
             for c in crews
         ],
         "sites": [
             {
-                "site_id": s["site_id"], "job": s.get("display") or s["site_id"],
-                "needs": s["needs"], "needed_crafts": s["needed_crafts"],
+                "site_id": s["site_id"],
+                "job": s.get("display") or s["site_id"],
+                "needs": s["needs"],
+                "needed_crafts": s["needed_crafts"],
                 "condition": conditions.get(s["site_id"], "clear"),
                 "scope_changes": flags.get(s["site_id"], []),
             }
@@ -81,7 +91,9 @@ def suggest_plan(context: dict, *, model_factory, model_names, max_output_tokens
     from vertexai.generative_models import GenerationConfig
 
     config = GenerationConfig(
-        response_mime_type="application/json", response_schema=PLAN_SCHEMA, max_output_tokens=max_output_tokens
+        response_mime_type="application/json",
+        response_schema=PLAN_SCHEMA,
+        max_output_tokens=max_output_tokens,
     )
     prompt = PROMPT.format(context=json.dumps(context))
     for name in model_names:
